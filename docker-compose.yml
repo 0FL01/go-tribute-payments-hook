@@ -1,0 +1,20 @@
+services:
+  tribute-listener:
+    image: 0fl01/go-tribute-payments-hook:0.0.1
+    container_name: tribute-listener-trib
+    hostname: tribute-listener
+    env_file:
+      - ./tribute-listener.env 
+    #networks:
+    #  - remnawave-network
+    volumes:
+      - ./tribute_session:/session
+    #depends_on: 
+      #- remnawave-tg-shop
+    #command: sh -c "echo 'Tribute listener is waiting for 30 seconds...' && sleep 30 && echo 'Starting tribute-hook...' && /usr/bin/tribute-hook"
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    restart: unless-stopped
