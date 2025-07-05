@@ -1,14 +1,20 @@
-FROM golang:1.23 AS builder
+FROM golang:1.23-alpine AS builder
 
-WORKDIR /build
-COPY app/go.mod app/go.sum /build/
-RUN cd /build; go mod download
+WORKDIR /src
 
-COPY app /build/
-RUN cd /build/app; ls; go build -o /usr/bin/tribute-hook
+COPY app/go.mod app/go.sum ./
+RUN go mod download
 
-FROM golang:1.23
+COPY app/ ./
 
-COPY --from=builder /usr/bin/tribute-hook /usr/bin/
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /tribute-hook .
 
-CMD ["/usr/bin/tribute-hook"]
+FROM gcr.io/distroless/static-debian12
+
+WORKDIR /app
+
+COPY --from=builder /tribute-hook /app/tribute-hook
+
+USER nonroot:nonroot
+
+CMD ["/app/tribute-hook"]
