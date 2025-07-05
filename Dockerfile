@@ -9,12 +9,19 @@ COPY app/ ./
 
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /tribute-hook .
 
-FROM gcr.io/distroless/static-debian12
+FROM alpine:3.22
+
+RUN apk add --no-cache su-exec &&addgroup -g 1001 nonroot && adduser -u 1001 -G nonroot -S -D nonroot
 
 WORKDIR /app
 
 COPY --from=builder /tribute-hook /app/tribute-hook
 
-USER nonroot:nonroot
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-CMD ["/app/tribute-hook"]
+USER 1001:1001
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+CMD []

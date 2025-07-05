@@ -1,6 +1,6 @@
 services:
   tribute-listener:
-    image: 0fl01/go-tribute-payments-hook:0.0.1
+    image: 0fl01/go-tribute-payments-hook:0.0.2
     container_name: tribute-listener-trib
     hostname: tribute-listener
     env_file:
